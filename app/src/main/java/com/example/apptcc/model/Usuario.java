@@ -1,8 +1,13 @@
 package com.example.apptcc.model;
 
+import com.example.apptcc.config.FirebaseConfig;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.Exclude;
+
 public class Usuario {
 
-    private int id;
+    private static final String NODE = "clientes";
+    private String id;
     private String nome;
     private String cpf;
     private String endereco;
@@ -19,11 +24,12 @@ public class Usuario {
         this.nome = nome;
     }
 
-    public int getId() {
+    @Exclude
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -75,11 +81,19 @@ public class Usuario {
         this.telefone = telefone;
     }
 
+    @Exclude
     public String getSenha() {
         return senha;
     }
 
     public void setSenha(String senha) {
         this.senha = senha;
+    }
+
+    public void salvar() {
+        DatabaseReference firebase = FirebaseConfig.getFirebaseDatabase();
+        firebase.child(NODE)
+                .child(this.id)
+                .setValue(this);
     }
 }

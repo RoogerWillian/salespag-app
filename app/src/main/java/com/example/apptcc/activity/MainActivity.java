@@ -12,15 +12,23 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
+import android.widget.TextView;
 
 import com.example.apptcc.R;
+import com.example.apptcc.config.FirebaseConfig;
 import com.example.apptcc.fragment.PedidosFragment;
 import com.example.apptcc.fragment.ProdutosFragment;
 import com.example.apptcc.helper.FragmentHelper;
+import com.example.apptcc.model.Usuario;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+
+    private FirebaseAuth autenticacao;
+    private TextView txtNomeUsuarioLogado;
+    private TextView txtEmailUsuarioLogado;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,7 +45,25 @@ public class MainActivity extends AppCompatActivity
         toggle.syncState();
         navigationView.setNavigationItemSelectedListener(this);
 
+        autenticacao = FirebaseConfig.getFirebaseAuth();
+        txtNomeUsuarioLogado = navigationView.getHeaderView(0).findViewById(R.id.txtNomeUsuarioLogado);
+        txtEmailUsuarioLogado = navigationView.getHeaderView(0).findViewById(R.id.txtEmailUsuarioLogado);
+
         FragmentHelper.show(this, R.id.container, new PedidosFragment());
+    }
+
+    @Override
+    protected void onStart() {
+        this.__carregarDadosUsuarioLogado();
+        super.onStart();
+    }
+
+    private void __carregarDadosUsuarioLogado() {
+        FirebaseUser currentUser = autenticacao.getCurrentUser();
+        if (currentUser != null) {
+            txtNomeUsuarioLogado.setText(currentUser.getDisplayName());
+            txtEmailUsuarioLogado.setText(currentUser.getEmail());
+        }
     }
 
     @Override
@@ -65,7 +91,9 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.acao_sair) {
+            autenticacao.signOut();
+            startActivity(new Intent(this, LoginActivity.class));
             return true;
         }
 
