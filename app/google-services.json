@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "641495925590",
+    "firebase_url": "https://salespag-a28cc.firebaseio.com",
+    "project_id": "salespag-a28cc",
+    "storage_bucket": "salespag-a28cc.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:641495925590:android:a090bbb24ef744c2",
+        "android_client_info": {
+          "package_name": "com.example.apptcc"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "641495925590-figfshmqbshn73opniien3btb7qo8298.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.apptcc",
+            "certificate_hash": "480a06d55a07751c045cc5159ed7118c782ac0c7"
+          }
+        },
+        {
+          "client_id": "641495925590-3ud593mihdos51tc185ampm4lnq38on3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDsCOURlvylnp40Q2EqsVgX8jgdsWNxwIA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "641495925590-3ud593mihdos51tc185ampm4lnq38on3.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
