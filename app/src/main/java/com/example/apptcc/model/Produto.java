@@ -1,21 +1,25 @@
 package com.example.apptcc.model;
 
-public class Produto {
+import android.util.Log;
 
-    private int id;
+import com.example.apptcc.config.FirebaseConfig;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.Exclude;
+
+import java.io.Serializable;
+import java.util.HashMap;
+
+public class Produto implements Serializable {
+
+    @Exclude
+    public static final String NODE = "produtos";
+    private String id;
     private String descricao;
     private String tamanho;
-    private double preco;
+    private Double preco;
     private String marca;
 
     public Produto() {
-    }
-
-    public Produto(String descricao, String tamanho, double preco, String marca) {
-        this.descricao = descricao;
-        this.tamanho = tamanho;
-        this.preco = preco;
-        this.marca = marca;
     }
 
     public String getMarca() {
@@ -26,11 +30,11 @@ public class Produto {
         this.marca = marca;
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -50,11 +54,55 @@ public class Produto {
         this.tamanho = tamanho;
     }
 
-    public double getPreco() {
+    public Double getPreco() {
         return preco;
     }
 
-    public void setPreco(double preco) {
+    public void setPreco(Double preco) {
         this.preco = preco;
+    }
+
+    @Exclude
+    public void salvar() {
+        DatabaseReference reference = FirebaseConfig.getFirebaseDatabase();
+        reference.child(NODE)
+                .child(this.id)
+                .setValue(this);
+    }
+
+    public void alterar() {
+        DatabaseReference reference = FirebaseConfig.getFirebaseDatabase();
+        DatabaseReference productRef = reference.child(NODE).child(this.id);
+        productRef.updateChildren(this.__toMap());
+    }
+
+    public void excluir() {
+        DatabaseReference reference = FirebaseConfig.getFirebaseDatabase();
+        DatabaseReference productRef = reference.child(NODE).child(this.id);
+        productRef.removeValue();
+    }
+
+    private HashMap<String, Object> __toMap() {
+        HashMap<String, Object> map = new HashMap<>();
+
+        map.put("id", this.id);
+        map.put("descricao", this.descricao);
+        map.put("marca", this.marca);
+        map.put("preco", this.preco);
+        map.put("tamanho", this.tamanho);
+
+        return map;
+    }
+
+    @Override
+    @Exclude
+    public String toString() {
+        return "Produto{" +
+                "id='" + id + '\'' +
+                ", descricao='" + descricao + '\'' +
+                ", tamanho='" + tamanho + '\'' +
+                ", preco=" + preco +
+                ", marca='" + marca + '\'' +
+                '}';
     }
 }

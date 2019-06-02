@@ -6,6 +6,13 @@
     tools:context=".fragment.ProdutosFragment"
     android:layout_marginTop="?android:attr/actionBarSize">
 
+    <ProgressBar
+        android:id="@+id/progressProdutos"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:visibility="gone" />
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recyclerProdutos"
         android:layout_width="match_parent"

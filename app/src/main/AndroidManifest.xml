@@ -9,8 +9,13 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activity.CadastroPedidoActivity"></activity>
-        <activity android:name=".activity.CadastroProdutoActivity"></activity>
+        <activity android:name=".activity.SobreActivity"></activity>
+        <activity
+            android:name=".activity.CadastroPedidoActivity"
+            android:parentActivityName=".activity.MainActivity" />
+        <activity
+            android:name=".activity.CadastroProdutoActivity"
+            android:parentActivityName=".activity.MainActivity" />
         <activity android:name=".activity.CadastroClienteActivity" />
         <activity android:name=".activity.LoginActivity">
             <intent-filter>
@@ -22,8 +27,7 @@
         <activity
             android:name=".activity.MainActivity"
             android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoActionBar">
-        </activity>
+            android:theme="@style/AppTheme.NoActionBar" />
     </application>
 
 </manifest>

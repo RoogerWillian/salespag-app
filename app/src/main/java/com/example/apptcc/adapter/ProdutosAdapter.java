@@ -14,6 +14,7 @@ import com.example.apptcc.model.Produto;
 import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.util.List;
+import java.util.Locale;
 
 public class ProdutosAdapter extends RecyclerView.Adapter<ProdutosAdapter.MyViewHolder> {
 
@@ -37,7 +38,7 @@ public class ProdutosAdapter extends RecyclerView.Adapter<ProdutosAdapter.MyView
         Produto produto = produtos.get(position);
 
         holder.descricao.setText(produto.getDescricao());
-        String preco = "R$ " + this.__formatarMoeda(String.valueOf(produto.getPreco()));
+        String preco = this.__formatarMoeda(String.valueOf(produto.getPreco()));
         holder.valor.setText(preco);
         String marcaTamanho = produto.getMarca() + " - " + produto.getTamanho();
         holder.marca.setText(marcaTamanho);
@@ -50,7 +51,7 @@ public class ProdutosAdapter extends RecyclerView.Adapter<ProdutosAdapter.MyView
 
     private String __formatarMoeda(String valorParaConverter) {
         BigDecimal valor = new BigDecimal(valorParaConverter);
-        NumberFormat nf = NumberFormat.getCurrencyInstance();
+        NumberFormat nf = NumberFormat.getCurrencyInstance(new Locale("pt", "BR"));
         return nf.format(valor);
     }
 

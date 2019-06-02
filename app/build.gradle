@@ -27,10 +27,13 @@ dependencies {
     implementation 'com.github.d-max:spots-dialog:1.1@aar'
     implementation 'br.com.uol.pslibs:checkout-in-app:0.0.9'
 
-    // FIrebase
+    // Firebase
     implementation 'com.google.firebase:firebase-core:15.0.0'
     implementation 'com.google.firebase:firebase-database:15.0.0'
     implementation 'com.google.firebase:firebase-auth:15.0.0'
+
+    // About Page
+    implementation 'com.github.medyo:android-about-page:1.2.5'
 
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'

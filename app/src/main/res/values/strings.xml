@@ -36,6 +36,8 @@
     <string name="categoria">Categoria</string>
     <string name="marca">Marca</string>
     <string name="cadastrar">Cadastrar</string>
+    <string name="tamanho">Tamanho</string>
+    <string name="preco">Preço</string>
 
     <string-array name="names">
         <item>Playstation 4</item>

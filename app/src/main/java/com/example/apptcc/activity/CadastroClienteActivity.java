@@ -26,6 +26,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
 
 import dmax.dialog.SpotsDialog;
 import io.reactivex.annotations.NonNull;
@@ -91,7 +93,7 @@ public class CadastroClienteActivity extends AppCompatActivity {
     }
 
     public void cadastrarUsuario() {
-        FirebaseAuth autenticacao = FirebaseConfig.getFirebaseAuth();
+        final FirebaseAuth autenticacao = FirebaseConfig.getFirebaseAuth();
         __configAlert("Cadastrando conta...");
         Helper.hideKeyboard(CadastroClienteActivity.this);
         autenticacao.createUserWithEmailAndPassword(usuario.getEmail(), usuario.getSenha())
@@ -103,6 +105,13 @@ public class CadastroClienteActivity extends AppCompatActivity {
                             String idUsuario = Base64Custom.codificar(usuario.getEmail());
                             usuario.setId(idUsuario);
                             usuario.salvar();
+
+                            FirebaseUser user = autenticacao.getCurrentUser();
+
+                            UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
+                                    .setDisplayName(usuario.getNome()).build();
+
+                            user.updateProfile(profileUpdates);
 
                             startActivity(new Intent(CadastroClienteActivity.this, MainActivity.class));
                             Toast.makeText(CadastroClienteActivity.this, "Conta cadastra com sucesso!", Toast.LENGTH_SHORT).show();
