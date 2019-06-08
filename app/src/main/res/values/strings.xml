@@ -38,6 +38,8 @@
     <string name="cadastrar">Cadastrar</string>
     <string name="tamanho">Tamanho</string>
     <string name="preco">Preço</string>
+    <string name="selecione_os_itens">Selecione os itens</string>
+    <string name="pagar_com_pagseguro">Pagar com Pagseguro</string>
 
     <string-array name="names">
         <item>Playstation 4</item>

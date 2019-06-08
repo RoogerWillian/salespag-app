@@ -2,10 +2,10 @@ package com.example.apptcc.model;
 
 import java.math.BigDecimal;
 
-class ItemPedido {
+public class ItemPedido {
 
     private Produto produto;
-    private int quantidade;
+    private int quantidade = 0;
     private BigDecimal valor;
 
     public ItemPedido() {
@@ -33,5 +33,14 @@ class ItemPedido {
 
     public void setValor(BigDecimal valor) {
         this.valor = valor;
+    }
+
+    @Override
+    public String toString() {
+        return "ItemPedido{" +
+                "produto=" + produto +
+                ", quantidade=" + quantidade +
+                ", valor=" + valor +
+                '}';
     }
 }

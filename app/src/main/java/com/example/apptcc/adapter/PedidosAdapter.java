@@ -11,8 +11,6 @@ import android.widget.TextView;
 import com.example.apptcc.R;
 import com.example.apptcc.model.Pedido;
 
-import java.math.BigDecimal;
-import java.text.NumberFormat;
 import java.util.List;
 
 public class PedidosAdapter extends RecyclerView.Adapter<PedidosAdapter.MyViewHolder> {
