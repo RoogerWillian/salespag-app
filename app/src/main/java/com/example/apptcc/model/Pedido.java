@@ -79,4 +79,15 @@ public class Pedido {
                 .child(getId())
                 .setValue(this);
     }
+
+    @Override
+    public String toString() {
+        return "Pedido{" +
+                "id='" + id + '\'' +
+                ", cliente=" + cliente +
+                ", itens=" + itens +
+                ", total='" + total + '\'' +
+                ", formaPagamento='" + formaPagamento + '\'' +
+                '}';
+    }
 }

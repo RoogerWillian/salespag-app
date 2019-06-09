@@ -33,6 +33,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import br.com.uol.pslibs.checkout_in_app.PSCheckout;
 import br.com.uol.pslibs.checkout_in_app.wallet.util.PSCheckoutConfig;
@@ -105,7 +106,7 @@ public class CadastroPedidoActivity extends AppCompatActivity {
         produtosRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot snapshot: dataSnapshot.getChildren()) {
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     Produto produto = snapshot.getValue(Produto.class);
                     ItemPedido itemPedido = new ItemPedido();
                     itemPedido.setProduto(produto);
@@ -164,7 +165,7 @@ public class CadastroPedidoActivity extends AppCompatActivity {
     }
 
     private void enviarParaPagamento() {
-        PSCheckoutRequest psCheckoutRequest = new PSCheckoutRequest().withReferenceCode("123");
+        PSCheckoutRequest psCheckoutRequest = new PSCheckoutRequest().withReferenceCode(UUID.randomUUID().toString());
         for (ItemPedido itemPedido : itens) {
             if (itemPedido != null) {
                 int quantidade = itemPedido.getQuantidade();
@@ -180,7 +181,7 @@ public class CadastroPedidoActivity extends AppCompatActivity {
             @Override
             public void onSuccess(PagSeguroResponse pagSeguroResponse, Context context) {
                 //Sucesso na transação
-                Toast.makeText(context, "Transação realizada com sucesso", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "Pagamento realizando com sucesso", Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -191,7 +192,7 @@ public class CadastroPedidoActivity extends AppCompatActivity {
 
             @Override
             public void onProgress(Context context) {
-                Toast.makeText(context, "Solicitando pagamento", Toast.LENGTH_SHORT).show();
+
             }
 
             @Override
@@ -240,10 +241,7 @@ public class CadastroPedidoActivity extends AppCompatActivity {
         //Informe o fragment container
         psCheckoutConfig.setContainer(R.id.framePagamento);
 
-        //Inicializa apenas os recursos de pagamento transparente e boleto
-        PSCheckout.initTransparent(this, psCheckoutConfig);
-
-        //Caso queira inicializar todos os recursos da lib
+        //Inicializando os recursos da lib
         PSCheckout.init(this, psCheckoutConfig);
     }
 
@@ -252,13 +250,22 @@ public class CadastroPedidoActivity extends AppCompatActivity {
         pedido.setCliente(usuarioLogado);
         pedido.setFormaPagamento("a vista");
         pedido.setItens(itens);
+
+        double total = 0.00;
+        for (ItemPedido itemPedido : itens) {
+            int quantidade = itemPedido.getQuantidade();
+            Double preco = itemPedido.getProduto().getPreco();
+            if (quantidade > 0)
+                total += quantidade * preco;
+        }
+
         pedido.setTotal(String.valueOf(total));
 
         new PedidoAsynTask(this)
                 .execute(pedido);
     }
 
-    class PedidoAsynTask extends AsyncTask<Pedido, Void, Void>{
+    class PedidoAsynTask extends AsyncTask<Pedido, Void, Void> {
 
         private AlertDialog.Builder builder;
         private Context context;

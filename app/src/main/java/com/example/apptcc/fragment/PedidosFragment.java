@@ -6,14 +6,20 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
 import com.example.apptcc.R;
 import com.example.apptcc.adapter.PedidosAdapter;
+import com.example.apptcc.config.FirebaseConfig;
 import com.example.apptcc.model.Pedido;
-import com.example.apptcc.model.Usuario;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +33,7 @@ public class PedidosFragment extends Fragment {
     private PedidosAdapter pedidosAdapter;
     private List<Pedido> pedidos = new ArrayList<>();
     private RecyclerView recyclerView;
+    private ProgressBar progressBar;
 
     @Override
     public void onStart() {
@@ -35,11 +42,26 @@ public class PedidosFragment extends Fragment {
     }
 
     private void __recuperarPedidos() {
-        pedidos.add(new Pedido(new Usuario("Pedro Augusto Guimarães"), "R$ 140,30", "Cartão de crédito MasterCard - 3x R$ 46,75"));
-        pedidos.add(new Pedido(new Usuario("Natalia Pereira Oliveira"), "R$ 50,00", "Cartão de crédito Visa - 5x R$ 25,00"));
-        pedidos.add(new Pedido(new Usuario("Patricia Nascimento"), "R$ 1.500,00", "Boleto bancário - a vista"));
-        pedidos.add(new Pedido(new Usuario("Renato Gonçalves da Silva"), "R$ 3.500,00", "Boleto bancário - a vista"));
-        pedidos.add(new Pedido(new Usuario("Fernanda Alvez Cardoso"), "R$ 30,00", "Boleto bancário - a vista"));
+        pedidos.clear();
+        progressBar.setVisibility(View.VISIBLE);
+        DatabaseReference databaseReference = FirebaseConfig.getFirebaseDatabase();
+        DatabaseReference pedidosRef = databaseReference.child("pedidos");
+        pedidosRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    Pedido pedido = snapshot.getValue(Pedido.class);
+                    pedidos.add(pedido);
+                    pedidosAdapter.notifyDataSetChanged();
+                    progressBar.setVisibility(View.GONE);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 
     @Override
@@ -66,6 +88,7 @@ public class PedidosFragment extends Fragment {
 
     private void __inicializarComponentes(View view) {
         this.recyclerView = view.findViewById(R.id.recyclerPedidos);
+        this.progressBar = view.findViewById(R.id.progressPedidos);
         this.pedidosAdapter = new PedidosAdapter(pedidos, getActivity());
     }
 }

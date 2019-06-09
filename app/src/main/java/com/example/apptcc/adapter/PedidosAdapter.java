@@ -11,7 +11,10 @@ import android.widget.TextView;
 import com.example.apptcc.R;
 import com.example.apptcc.model.Pedido;
 
+import java.math.BigDecimal;
+import java.text.NumberFormat;
 import java.util.List;
+import java.util.Locale;
 
 public class PedidosAdapter extends RecyclerView.Adapter<PedidosAdapter.MyViewHolder> {
 
@@ -34,7 +37,7 @@ public class PedidosAdapter extends RecyclerView.Adapter<PedidosAdapter.MyViewHo
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
         Pedido pedido = pedidos.get(position);
         holder.cliente.setText(pedido.getCliente().getNome());
-        holder.valor.setText(pedido.getTotal());
+        holder.valor.setText(__formatarMoeda(pedido.getTotal()));
         holder.formaPagto.setText(pedido.getFormaPagamento());
     }
 
@@ -42,6 +45,13 @@ public class PedidosAdapter extends RecyclerView.Adapter<PedidosAdapter.MyViewHo
     public int getItemCount() {
         return pedidos.size();
     }
+
+    private String __formatarMoeda(String valorParaConverter) {
+        BigDecimal valor = new BigDecimal(valorParaConverter);
+        NumberFormat nf = NumberFormat.getCurrencyInstance(new Locale("pt", "BR"));
+        return nf.format(valor);
+    }
+
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
 
