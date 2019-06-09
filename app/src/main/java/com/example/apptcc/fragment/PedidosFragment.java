@@ -28,10 +28,6 @@ public class PedidosFragment extends Fragment {
     private List<Pedido> pedidos = new ArrayList<>();
     private RecyclerView recyclerView;
 
-    public PedidosFragment() {
-        // Required empty public constructor
-    }
-
     @Override
     public void onStart() {
         super.onStart();

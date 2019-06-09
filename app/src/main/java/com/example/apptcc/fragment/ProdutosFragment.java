@@ -46,12 +46,6 @@ public class ProdutosFragment extends Fragment {
     private ProdutosAdapter produtoAdapter;
     private ProgressBar progressBar;
     private List<Produto> produtos = new ArrayList<>();
-    private ChildEventListener childEventListener;
-
-    public ProdutosFragment() {
-        // Required empty public constructor
-    }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -71,43 +65,53 @@ public class ProdutosFragment extends Fragment {
         this.__recuperarProdutos();
     }
 
-    @Override
-    public void onStop() {
-        DatabaseReference databaseReference = FirebaseConfig.getFirebaseDatabase();
-        databaseReference.removeEventListener(childEventListener);
-        super.onStop();
-    }
-
     private void __recuperarProdutos() {
         produtos.clear();
         progressBar.setVisibility(View.VISIBLE);
         DatabaseReference databaseReference = FirebaseConfig.getFirebaseDatabase();
         DatabaseReference produtosRef = databaseReference.child(Produto.NODE);
-        childEventListener = produtosRef.addChildEventListener(new ChildEventListener() {
+        produtosRef.addValueEventListener(new ValueEventListener() {
             @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                Produto produto = dataSnapshot.getValue(Produto.class);
-                produtos.add(produto);
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot snapshot: dataSnapshot.getChildren()) {
+                    Produto produto = snapshot.getValue(Produto.class);
+                    produtos.add(produto);
+                }
                 produtoAdapter.notifyDataSetChanged();
                 progressBar.setVisibility(View.GONE);
-            }
 
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-            }
-
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
+
             }
         });
+//        childEventListener = produtosRef.addChildEventListener(new ChildEventListener() {
+//            @Override
+//            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+//                Produto produto = dataSnapshot.getValue(Produto.class);
+//                produtos.add(produto);
+//                produtoAdapter.notifyDataSetChanged();
+//                progressBar.setVisibility(View.GONE);
+//            }
+//
+//            @Override
+//            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+//            }
+//
+//            @Override
+//            public void onChildRemoved(DataSnapshot dataSnapshot) {
+//            }
+//
+//            @Override
+//            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+//            }
+//
+//            @Override
+//            public void onCancelled(DatabaseError databaseError) {
+//            }
+//        });
     }
 
     private void __configurarRecyclerView() {

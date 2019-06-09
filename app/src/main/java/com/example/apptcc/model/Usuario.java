@@ -6,7 +6,7 @@ import com.google.firebase.database.Exclude;
 
 public class Usuario {
 
-    private static final String NODE = "clientes";
+    public static final String NODE = "clientes";
     private String id;
     private String nome;
     private String cpf;

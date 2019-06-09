@@ -1,11 +1,18 @@
 package com.example.apptcc.model;
 
+import android.provider.ContactsContract;
+
+import com.example.apptcc.config.FirebaseConfig;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.Exclude;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class Pedido {
 
-    private int id;
+    private static final String NODE = "pedidos";
+    private String id;
     private Usuario cliente;
     private List<ItemPedido> itens = new ArrayList<>();
     private String total;
@@ -21,11 +28,11 @@ public class Pedido {
         this.formaPagamento = formaPagamento;
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -59,5 +66,17 @@ public class Pedido {
 
     public void setFormaPagamento(String formaPagamento) {
         this.formaPagamento = formaPagamento;
+    }
+
+    @Exclude
+    public void salvar() {
+        DatabaseReference reference = FirebaseConfig.getFirebaseDatabase();
+        DatabaseReference pedidoReference = reference.child(NODE);
+        String id = pedidoReference.push().getKey();
+        setId(id);
+
+        reference.child(NODE)
+                .child(getId())
+                .setValue(this);
     }
 }

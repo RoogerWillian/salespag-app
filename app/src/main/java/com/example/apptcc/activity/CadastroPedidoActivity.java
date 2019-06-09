@@ -1,9 +1,12 @@
 package com.example.apptcc.activity;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -16,12 +19,17 @@ import android.widget.Toast;
 import com.example.apptcc.R;
 import com.example.apptcc.adapter.ItemPedidoAdapter;
 import com.example.apptcc.config.FirebaseConfig;
+import com.example.apptcc.helper.Base64Custom;
 import com.example.apptcc.model.ItemPedido;
+import com.example.apptcc.model.Pedido;
 import com.example.apptcc.model.Produto;
+import com.example.apptcc.model.Usuario;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,8 +44,10 @@ public class CadastroPedidoActivity extends AppCompatActivity {
     private RecyclerView listItensVenda;
     private List<ItemPedido> itens = new ArrayList<>();
     private ItemPedidoAdapter itemPedidoAdapter;
-    private ChildEventListener childEventListener;
     private ConstraintLayout pedidoLayoutPrincipal;
+    private Double total = 0D;
+    private Usuario usuarioLogado = null;
+    private DatabaseReference database;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,32 +75,22 @@ public class CadastroPedidoActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-//        pedidoLayoutPrincipal.setVisibility(View.VISIBLE);
-        itens.clear();
-        DatabaseReference database = FirebaseConfig.getFirebaseDatabase();
-        childEventListener = database.child(Produto.NODE).addChildEventListener(new ChildEventListener() {
+
+        FirebaseUser user = FirebaseConfig.getFirebaseAuth().getCurrentUser();
+        String idUsuario = Base64Custom.codificar(user.getEmail());
+
+        database = FirebaseConfig.getFirebaseDatabase();
+        DatabaseReference usuarioRef = database.child(Usuario.NODE)
+                .child(idUsuario);
+        usuarioRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                Produto produto = dataSnapshot.getValue(Produto.class);
-                ItemPedido itemPedido = new ItemPedido();
-                itemPedido.setProduto(produto);
-                itens.add(itemPedido);
-                itemPedidoAdapter.notifyDataSetChanged();
-            }
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                usuarioLogado = dataSnapshot.getValue(Usuario.class);
 
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
-            }
-
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
+                //                se o codigo acima nao funcionar tente o codigo abaixo
+//                for (DataSnapshot snapshot: dataSnapshot.getChildren()) {
+//                    usuarioLogado = dataSnapshot.getValue(Usuario.class);
+//                }
             }
 
             @Override
@@ -98,6 +98,58 @@ public class CadastroPedidoActivity extends AppCompatActivity {
 
             }
         });
+
+//        pedidoLayoutPrincipal.setVisibility(View.VISIBLE);
+        itens.clear();
+        DatabaseReference produtosRef = database.child(Produto.NODE);
+        produtosRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot snapshot: dataSnapshot.getChildren()) {
+                    Produto produto = snapshot.getValue(Produto.class);
+                    ItemPedido itemPedido = new ItemPedido();
+                    itemPedido.setProduto(produto);
+                    itens.add(itemPedido);
+//                    total += itemPedido.getValor();
+                }
+                itemPedidoAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+//        childEventListener = database.child(Produto.NODE).addChildEventListener(new ChildEventListener() {
+//            @Override
+//            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+//                Produto produto = dataSnapshot.getValue(Produto.class);
+//                ItemPedido itemPedido = new ItemPedido();
+//                itemPedido.setProduto(produto);
+//                itens.add(itemPedido);
+//                itemPedidoAdapter.notifyDataSetChanged();
+//            }
+//
+//            @Override
+//            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+//
+//            }
+//
+//            @Override
+//            public void onChildRemoved(DataSnapshot dataSnapshot) {
+//
+//            }
+//
+//            @Override
+//            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+//
+//            }
+//
+//            @Override
+//            public void onCancelled(DatabaseError databaseError) {
+//
+//            }
+//        });
     }
 
     @Override
@@ -178,9 +230,6 @@ public class CadastroPedidoActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
-
-        DatabaseReference database = FirebaseConfig.getFirebaseDatabase();
-        database.removeEventListener(childEventListener);
     }
 
     private void __inicializarPagSeguro() {
@@ -199,6 +248,70 @@ public class CadastroPedidoActivity extends AppCompatActivity {
     }
 
     public void pagarComPagseguro(View view) {
-        Toast.makeText(this, "Implementar pagamento fake", Toast.LENGTH_SHORT).show();
+        Pedido pedido = new Pedido();
+        pedido.setCliente(usuarioLogado);
+        pedido.setFormaPagamento("a vista");
+        pedido.setItens(itens);
+        pedido.setTotal(String.valueOf(total));
+
+        new PedidoAsynTask(this)
+                .execute(pedido);
+    }
+
+    class PedidoAsynTask extends AsyncTask<Pedido, Void, Void>{
+
+        private AlertDialog.Builder builder;
+        private Context context;
+        private AlertDialog dialog;
+
+        public PedidoAsynTask(Context context) {
+            this.context = context;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+            builder = new AlertDialog.Builder(context);
+            builder.setView(R.layout.dialog_pagamento);
+            builder.setCancelable(false);
+
+            dialog = builder.create();
+            dialog.show();
+        }
+
+
+        @Override
+        protected Void doInBackground(Pedido... pedidos) {
+            Pedido pedido = pedidos[0];
+            try {
+                pedido.salvar();
+                Thread.sleep(5000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            dialog.dismiss();
+
+            builder = new AlertDialog.Builder(context);
+            builder.setTitle("Pagamento Concluido");
+            builder.setMessage("Pagamento realizado com sucesso.");
+            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                    finish();
+                }
+            });
+            dialog = builder.create();
+            dialog.show();
+
+        }
     }
 }
